@@ -50,7 +50,7 @@ public static class Program
 
         app.MapGet("/cluster",
             static ([FromServices] IRaftCluster cluster) => Results.Ok(string.Join(',', cluster.Members.Select(f => f.Id.ToString() + "/" + f.Status))));
-        app.MapGet("/leader", async () => Results.Ok(cluster.Leader?.EndPoint.ToString()));
+        app.MapGet("/leader", () => Results.Ok(cluster.Leader?.EndPoint.ToString()));
 
         app.MapPost("/cluster", async ([FromBody] AddMember member) =>
         {
@@ -77,7 +77,7 @@ public static class Program
         });
 
         cluster.LeaderChanged += LeaderChanged;
-        cluster.MemberRemoved += async (raftCluster, eventArgs) =>
+        cluster.MemberRemoved += (raftCluster, eventArgs) =>
         {
             Console.WriteLine("MemberRemoved {0} {1}", eventArgs.Member.EndPoint, eventArgs.Member.IsLeader);
         };
